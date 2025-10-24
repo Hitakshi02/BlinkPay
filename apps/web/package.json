@@ -1,0 +1,16 @@
+{
+  "name": "blinkpay-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": { "dev": "next dev", "build": "next build", "start": "next start" },
+  "dependencies": {
+    "next": "15.0.3",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "wagmi": "^2.12.7",
+    "viem": "^2.21.3",
+    "@tanstack/react-query": "^5.56.2",
+    "zustand": "^4.5.2",
+    "axios": "^1.7.7"
+  }
+}

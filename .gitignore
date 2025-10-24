@@ -1,0 +1,8 @@
+
+# safety
+.env
+.env.local
+packages/**/.env
+apps/**/.env.local
+.venv
+
