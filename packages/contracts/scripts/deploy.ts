@@ -1,13 +1,15 @@
 import { ethers } from "hardhat";
-import * as dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 async function main() {
-  const pyusd = process.env.PYUSD!;
-  if (!pyusd) throw new Error("PYUSD not set");
-  const Vault = await ethers.getContractFactory("SessionVault");
-  const vault = await Vault.deploy(pyusd);
-  await vault.deployed();
-  console.log("SessionVault deployed to:", vault.address);
+  const F = await ethers.getContractFactory("SessionVault");
+  const pyusd = process.env.PYUSD;
+  if (!pyusd) {
+    throw new Error("Missing PYUSDenvironment variable");
+  }
+  const vault = await F.deploy(pyusd);
+  await vault.waitForDeployment();
+  console.log("SessionVault:", await vault.getAddress());
 }
+
 main().catch((e) => { console.error(e); process.exit(1); });

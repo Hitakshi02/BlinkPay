@@ -1,0 +1,43 @@
+|   "function allowance(address,address) external view returns (uint256)"
+'function allowance(address,address) external view returns (uint256)'
+> ], me)
+], me)
+^
+
+Uncaught SyntaxError: Unexpected token ']'
+> await (await erc20.approve(vaultAddr, 5_000_000)).wait()
+Uncaught:
+NotImplementedError: Method 'HardhatEthersProvider.resolveName' is not implemented
+    at HardhatEthersProvider.resolveName (/Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/@nomicfoundation/hardhat-ethers/src/internal/hardhat-ethers-provider.ts:364:11)
+    at HardhatEthersSigner.resolveName (/Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:164:26)
+    at resolveAddress (/Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/ethers/src.ts/address/checks.ts:113:46)
+    at /Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/ethers/src.ts/contract/contract.ts:172:60
+    at ParamType.#walkAsync (/Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/ethers/src.ts/abi/fragments.ts:779:24)
+    at ParamType.walkAsync (/Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/ethers/src.ts/abi/fragments.ts:797:24)
+    at /Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/ethers/src.ts/contract/contract.ts:170:22
+    at Array.map (<anonymous>)
+    at resolveArgs (/Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/ethers/src.ts/contract/contract.ts:169:37)
+    at populateTransaction (/Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/ethers/src.ts/contract/contract.ts:294:36)
+> const erc20 = new ethers.Contract(pyusdAddr, [
+|   "function approve(address,uint256) external returns (bool)",
+|   "function allowance(address,address) external view returns (uint256)"
+| ], me)
+Uncaught SyntaxError: Identifier 'erc20' has already been declared
+> await (await erc20.approve(vaultAddr, 5_000_000)).wait()
+Uncaught:
+NotImplementedError: Method 'HardhatEthersProvider.resolveName' is not implemented
+    at HardhatEthersProvider.resolveName (/Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/@nomicfoundation/hardhat-ethers/src/internal/hardhat-ethers-provider.ts:364:11)
+    at HardhatEthersSigner.resolveName (/Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/@nomicfoundation/hardhat-ethers/src/signers.ts:164:26)
+    at resolveAddress (/Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/ethers/src.ts/address/checks.ts:113:46)
+    at /Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/ethers/src.ts/contract/contract.ts:172:60
+    at ParamType.#walkAsync (/Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/ethers/src.ts/abi/fragments.ts:779:24)
+    at ParamType.walkAsync (/Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/ethers/src.ts/abi/fragments.ts:797:24)
+    at /Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/ethers/src.ts/contract/contract.ts:170:22
+    at Array.map (<anonymous>)
+    at resolveArgs (/Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/ethers/src.ts/contract/contract.ts:169:37)
+    at populateTransaction (/Users/hitakshi/Documents/BlinkPay/packages/contracts/node_modules/ethers/src.ts/contract/contract.ts:294:36)
+> const erc20 = new ethers.Contract(pyusdAddr, [
+|   "function approve(address,uint256) external returns (bool)",
+|   "function allowance(address,address) external view returns (uint256)"
+| ], me);
+Uncaught SyntaxError: Identifier 'erc20' has already been declared

@@ -6,3 +6,19 @@ packages/**/.env
 apps/**/.env.local
 .venv
 
+# env
+*.env
+*.env.local
+.env
+.env.local
+
+# node
+node_modules/
+dist/
+.cache/
+.next/
+
+# hardhat / types
+typechain/
+artifacts/
+coverage/
