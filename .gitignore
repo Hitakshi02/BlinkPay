@@ -22,3 +22,16 @@ dist/
 typechain/
 artifacts/
 coverage/
+# envs
+.env
+.env.* 
+*.env
+*.env.*
+# build
+node_modules/
+dist/
+.next/
+artifacts/
+cache/
+typechain/
+coverage/

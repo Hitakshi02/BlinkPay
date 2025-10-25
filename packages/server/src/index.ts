@@ -24,6 +24,10 @@ app.get(
   (_req, res) => res.status(200).json({ ok: true })
 );
 
+app.get("/", (_req, res) =>
+  res.json({ ok: true, service: "BlinkPay API", routes: ["/health", "/sessions"] })
+);
+
 // Healthcheck
 app.get("/health", (_req, res) =>
   res.json({ ok: true, ts: Date.now(), env: ENV.NODE_ENV })
