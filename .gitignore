@@ -1,37 +1,34 @@
+# OS
+.DS_Store
 
-# safety
+# Node / Next
+node_modules/
+.next/
+out/
+dist/
+coverage/
+.eslintcache
+.turbo/
+.pnpm-store/
+
+# Python
+.venv/
+__pycache__/
+
+# Env
 .env
-.env.local
+.env.*
+!.env.example
+apps/**/.env
+apps/**/.env.*
 packages/**/.env
-apps/**/.env.local
-.venv
+packages/**/.env.*
 
-# env
-*.env
-*.env.local
-.env
-.env.local
+# Editor
+.vscode/
+.idea/
 
-# node
-node_modules/
-dist/
-.cache/
-.next/
-
-# hardhat / types
-typechain/
-artifacts/
-coverage/
-# envs
-.env
-.env.* 
-*.env
-*.env.*
-# build
-node_modules/
-dist/
-.next/
-artifacts/
-cache/
-typechain/
-coverage/
+# Media/LFS (optional)
+*.mp4
+*.mov
+*.zip
