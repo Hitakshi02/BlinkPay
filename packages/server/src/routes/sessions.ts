@@ -1,7 +1,7 @@
-import { Router } from 'express';
-import { z } from 'zod';
-import { ethers } from 'ethers';
-import { ENV } from '../env';
+import { Router } from "express";
+import { z } from "zod";
+import { ethers } from "ethers";
+import { ENV } from "../env";
 
 // ---- In-memory Yellow-like session store ----
 type Session = {
@@ -19,26 +19,32 @@ function openYellowSession(id: string, user: string, merchant: string, allowance
 }
 function addSpend(id: string, delta: bigint) {
   const s = sessions.get(id);
-  if (!s) throw new Error('session not found');
-  if (!s.open) throw new Error('session closed');
-  s.spent += delta;
+  if (!s) throw new Error("session not found");
+  if (!s.open) throw new Error("session closed");
+  const newTotal = s.spent + delta;
+  if (newTotal > s.allowance) throw new Error("exceeds allowance");
+  s.spent = newTotal;
   return s;
 }
 function endSession(id: string) {
   const s = sessions.get(id);
-  if (!s) throw new Error('session not found');
+  if (!s) throw new Error("session not found");
+  if (!s.open) throw new Error("closed");
   s.open = false;
   return s;
 }
 function getSession(id: string) {
   return sessions.get(id);
 }
+function fmt(s: Session) {
+  return { ...s, allowance: s.allowance.toString(), spent: s.spent.toString() };
+}
 
 // ---- Minimal ABI for SessionVault ----
 const VAULT_ABI = [
-  'function openSession(bytes32 id,address user,address merchant,uint256 allowance) external',
-  'function accountOffchainSpend(bytes32 id,uint256 newTotalSpent) external',
-  'function settle(bytes32 id) external'
+  "function openSession(bytes32 id,address user,address merchant,uint256 allowance) external",
+  "function accountOffchainSpend(bytes32 id,uint256 newTotalSpent) external",
+  "function settle(bytes32 id) external",
 ];
 
 const provider = new ethers.JsonRpcProvider(ENV.RPC_URL);
@@ -47,20 +53,20 @@ const vault = new ethers.Contract(ENV.SESSION_VAULT, VAULT_ABI, wallet);
 
 const router = Router();
 
-// POST /sessions/open
-router.post('/open', async (req, res) => {
+// -------------------- POSTs --------------------
+router.post("/open", async (req, res) => {
   try {
     const schema = z.object({
       sessionId: z.string().min(1),
       user: z.string().min(1),
       merchant: z.string().default(ENV.MERCHANT_ADDRESS),
-      allowance: z.string().regex(/^\d+$/) // wei as string
+      allowance: z.string().regex(/^\d+$/), // base units as string
     });
     const body = schema.parse(req.body);
 
     openYellowSession(body.sessionId, body.user, body.merchant, BigInt(body.allowance));
     const tx = await vault.openSession(
-      ethers.id(body.sessionId), // bytes32
+      ethers.id(body.sessionId),
       body.user,
       body.merchant,
       body.allowance
@@ -72,27 +78,24 @@ router.post('/open', async (req, res) => {
   }
 });
 
-// POST /sessions/spend
-router.post('/spend', async (req, res) => {
+router.post("/spend", async (req, res) => {
   try {
     const schema = z.object({
       sessionId: z.string().min(1),
-      delta: z.string().regex(/^\d+$/) // wei as string
+      delta: z.string().regex(/^\d+$/),
     });
     const { sessionId, delta } = schema.parse(req.body);
 
     const s = addSpend(sessionId, BigInt(delta));
     const tx = await vault.accountOffchainSpend(ethers.id(sessionId), s.spent.toString());
     await tx.wait();
-
     res.json({ ok: true, newTotal: s.spent.toString(), txHash: tx.hash });
   } catch (e: any) {
     res.status(400).json({ ok: false, error: e.message ?? String(e) });
   }
 });
 
-// POST /sessions/settle
-router.post('/settle', async (req, res) => {
+router.post("/settle", async (req, res) => {
   try {
     const schema = z.object({ sessionId: z.string().min(1) });
     const { sessionId } = schema.parse(req.body);
@@ -100,25 +103,42 @@ router.post('/settle', async (req, res) => {
     const s = endSession(sessionId);
     const tx = await vault.settle(ethers.id(sessionId));
     await tx.wait();
-
     res.json({ ok: true, paid: s.spent.toString(), txHash: tx.hash });
   } catch (e: any) {
     res.status(400).json({ ok: false, error: e.message ?? String(e) });
   }
 });
 
-// GET /sessions/:id
-router.get('/:id', (req, res) => {
-  const s = getSession(req.params.id);
-  if (!s) return res.status(404).json({ ok: false, error: 'not found' });
+// -------------------- GETs (specific first) --------------------
+router.get("/list", (_req, res) => {
+  const list = Array.from(sessions.values()).map(fmt).reverse();
+  res.json({ ok: true, sessions: list });
+});
+
+router.get("/receipt/:id", (req, res) => {
+  const s = sessions.get(req.params.id);
+  if (!s) return res.status(404).json({ ok: false, error: "not found" });
+  const paid = s.spent;
+  const refund = s.allowance > s.spent ? s.allowance - s.spent : 0n;
+  const text = `Paid ${(Number(paid) / 1_000_000).toFixed(6)} PYUSD to ${s.merchant} for session ${s.id}. Refund ${(Number(refund) / 1_000_000).toFixed(6)} back to ${s.user}.`;
   res.json({
     ok: true,
-    session: {
-      ...s,
-      allowance: s.allowance.toString(),
-      spent: s.spent.toString()
-    }
+    receipt: {
+      id: s.id,
+      user: s.user,
+      merchant: s.merchant,
+      paid: paid.toString(),
+      refund: refund.toString(),
+      text,
+    },
   });
+});
+
+// -------------------- GET by id (KEEP LAST) --------------------
+router.get("/:id", (req, res) => {
+  const s = getSession(req.params.id);
+  if (!s) return res.status(404).json({ ok: false, error: "not found" });
+  res.json({ ok: true, session: fmt(s) });
 });
 
 export default router;

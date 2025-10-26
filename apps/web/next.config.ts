@@ -1,4 +1,4 @@
-/** @type {import('next').NextConfig} */
+// apps/web/next.config.ts
 const nextConfig = {
   async headers() {
     return [
@@ -12,9 +12,9 @@ const nextConfig = {
               "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob:",
-              // 👇 allow API + RPC + any ws you’ll use
-              "connect-src 'self' http://localhost:4000 https://eth-sepolia.g.alchemy.com",
               "font-src 'self' data:",
+              // 👇 add BOTH https and wss for Yellow, plus your API
+              "connect-src 'self' http://localhost:4000 https://clearnet.yellow.com wss://clearnet.yellow.com",
               "frame-src 'self'",
             ].join("; "),
           },
@@ -23,4 +23,4 @@ const nextConfig = {
     ];
   },
 };
-module.exports = nextConfig;
+export default nextConfig;
